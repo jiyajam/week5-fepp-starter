@@ -9,9 +9,10 @@ const Home = () => {
       try {
         const response = await fetch('/api/jobs')
         const data = await response.json()
-        setJobs(data) // update the jobs state
+        setJobs(Array.isArray(data) ? data : [])
       } catch (error) {
         console.error('Failed to fetch jobs:', error)
+        setJobs([]) // fallback to empty array
       }
     }
 
@@ -23,7 +24,9 @@ const Home = () => {
       <div className='job-list'>
         {jobs.length === 0 && <p>No jobs found</p>}
         {jobs.length !== 0 &&
-          jobs.map((job) => <JobListing key={job._id} {...job} />)}
+          jobs.map((job, index) => (
+            <JobListing key={index} id={index} {...job} />
+          ))}
       </div>
     </div>
   )

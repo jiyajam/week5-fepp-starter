@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 
 const JobPage = () => {
-  const { jobId } = useParams() // Get the job ID from the URL
+  const { id: jobId } = useParams() // Get the job ID from the URL
   const navigate = useNavigate()
   const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -18,6 +18,7 @@ const JobPage = () => {
         const data = await response.json()
         setJob(data)
       } catch (err) {
+        console.error('Error fetching job:', err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -37,7 +38,7 @@ const JobPage = () => {
       if (!response.ok) throw new Error('Failed to delete job')
       navigate('/')
     } catch (err) {
-      console.log(err)
+      console.error('Error deleting job:', err)
       setError(err.message)
     }
   }
