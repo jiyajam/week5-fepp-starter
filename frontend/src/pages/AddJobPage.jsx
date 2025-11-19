@@ -27,12 +27,18 @@ const AddJobPage = () => {
       location,
       salary: Number(salary),
     }
-    await fetch('/api/jobs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(jobData),
-    })
-    navigate('/')
+
+    try {
+      const res = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jobData),
+      })
+      if (!res.ok) throw new Error('Failed to add job')
+      navigate('/')
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
   console.log('AddJobPage')

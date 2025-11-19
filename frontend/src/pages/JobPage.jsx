@@ -1,45 +1,61 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 
 const JobPage = () => {
-  const { id } = useParams(); // Get the job ID from the URL
-  const [job, setJob] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { jobId } = useParams() // Get the job ID from the URL
+  const navigate = useNavigate()
+  const [job, setJob] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/jobs/${id}`);
+        const response = await fetch(`/api/jobs/${jobId}`)
         if (!response.ok) {
-          throw new Error("Failed to fetch job");
+          throw new Error('Failed to fetch job')
         }
-        const data = await response.json();
-        setJob(data);
+        const data = await response.json()
+        setJob(data)
       } catch (err) {
-        setError(err.message);
+        setError(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchJob();
-  }, [id]);
+    fetchJob()
+  }, [jobId])
+  //to delete
+  const deleteJob = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete?')
+    if (!confirmDelete) return
+    try {
+      const response = await fetch(`/api/jobs/${jobId}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) throw new Error('Failed to delete job')
+      navigate('/')
+    } catch (err) {
+      console.log(err)
+      setError(err.message)
+    }
+  }
 
   if (loading) {
-    return <p>Loading job...</p>;
+    return <p>Loading job...</p>
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>Error: {error}</p>
   }
 
   if (!job) {
-    return <p>Job not found</p>;
+    return <p>Job not found</p>
   }
 
   return (
-    <div className="job-details">
+    <div className='job-details'>
       <h2>{job.title}</h2>
       <p>Type: {job.type}</p>
       <p>Description: {job.description}</p>
@@ -50,11 +66,12 @@ const JobPage = () => {
       <p>Salary: {job.salary}</p>
       <p>Posted Date: {job.postedDate}</p>
 
-      <Link to={`/edit-job/${id}`}>
+      <Link to={`/edit-job/${jobId}`}>
         <button>Edit Job</button>
       </Link>
+      <button onClick={deleteJob}>Delete Job</button>
     </div>
-  );
-};
+  )
+}
 
-export default JobPage;
+export default JobPage
