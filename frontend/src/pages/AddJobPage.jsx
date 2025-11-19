@@ -19,13 +19,14 @@ const AddJobPage = () => {
       title,
       type,
       description,
+      location,
+      salary: salary.toString(),
+
       company: {
         name: companyName,
         contactEmail,
         contactPhone,
       },
-      location,
-      salary: Number(salary),
     }
 
     try {
