@@ -17,15 +17,11 @@ const EditJobPage = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(`/api/jobs/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(`http://localhost:4000/api/jobs/${id}`);
         if (!res.ok) {
           throw new Error("Failed to fetch job");
         }
+
         const data = await res.json();
         setTitle(data.title);
         setType(data.type);
@@ -42,13 +38,45 @@ const EditJobPage = () => {
     fetchJob();
   }, [id]);
 
-  const submitForm = (e) => {
+  //  UPDATE the job using PUT request
+  const submitForm = async (e) => {
     e.preventDefault();
-    console.log("EditJobPage");
+
+    try {
+      const res = await fetch(`http://localhost:4000/api/jobs/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          type,
+          description,
+          location,
+          salary: Number(salary),
+          company: {
+            name: companyName,
+            contactEmail,
+            contactPhone,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update job");
+      }
+
+      // Redirect back to single job page
+      navigate(`/jobs/${id}`);
+    } catch (error) {
+      console.log("Error updating job", error);
+    }
   };
 
+  // BEFORE: console.log("cancelEdit")
+  // AFTER: Go back to job details page
   const cancelEdit = () => {
-    console.log("cancelEdit");
+    navigate(`/jobs/${id}`);
   };
 
   return (
@@ -57,6 +85,7 @@ const EditJobPage = () => {
       <form onSubmit={submitForm}>
         <label>Job title:</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} />
+
         <label>Job type:</label>
         <select value={type} onChange={(e) => setType(e.target.value)}>
           <option value="" disabled>
@@ -73,25 +102,31 @@ const EditJobPage = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>
+
         <label>Company Name:</label>
         <input
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
         />
+
         <label>Contact Email:</label>
         <input
           value={contactEmail}
           onChange={(e) => setContactEmail(e.target.value)}
         />
+
         <label>Contact Phone:</label>
         <input
           value={contactPhone}
           onChange={(e) => setContactPhone(e.target.value)}
         />
+
         <label>Location:</label>
         <input value={location} onChange={(e) => setLocation(e.target.value)} />
+
         <label>Salary:</label>
         <input value={salary} onChange={(e) => setSalary(e.target.value)} />
+
         <button type="submit">Update Job</button>
         <button type="button" onClick={cancelEdit}>
           Cancel
