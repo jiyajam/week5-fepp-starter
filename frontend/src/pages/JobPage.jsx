@@ -1,17 +1,41 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 const JobPage = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Get the job ID from the URL
   const [job, setJob] = useState(null);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const deleteJob = async () => {
-    console.log(JobPage);
-  };
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/jobs/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch job");
+        }
+        const data = await response.json();
+        setJob(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [id]);
+
+  if (loading) {
+    return <p>Loading job...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!job) {
-    return <div>Loading...</div>;
+    return <p>Job not found</p>;
   }
 
   return (
@@ -19,16 +43,16 @@ const JobPage = () => {
       <h2>{job.title}</h2>
       <p>Type: {job.type}</p>
       <p>Description: {job.description}</p>
-      <p>Company: {job.company.name}</p>
-      <p>Contact Email: {job.company.contactEmail}</p>
-      <p>Contact Phone: {job.company.contactPhone}</p>
+      <p>Company: {job.company?.name}</p>
+      <p>Contact Email: {job.company?.contactEmail}</p>
+      <p>Contact Phone: {job.company?.contactPhone}</p>
       <p>Location: {job.location}</p>
       <p>Salary: {job.salary}</p>
       <p>Posted Date: {job.postedDate}</p>
+
       <Link to={`/edit-job/${id}`}>
         <button>Edit Job</button>
       </Link>
-      <button onClick={deleteJob}>Delete Job</button>
     </div>
   );
 };
