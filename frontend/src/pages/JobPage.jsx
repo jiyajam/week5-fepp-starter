@@ -27,16 +27,12 @@ const JobPage = () => {
 
     fetchJob()
   }, [jobId])
-  //to delete
+  //to Delete
   const deleteJob = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete?')
-    if (!confirmDelete) return
     try {
-      const response = await fetch(`/api/jobs/${jobId}`, {
-        method: 'DELETE',
-      })
+      const response = await fetch(`/api/jobs/${jobId}`, { method: 'DELETE' })
       if (!response.ok) throw new Error('Failed to delete job')
-      navigate('/')
+      navigate('/') // Go back to home page after deletion
     } catch (err) {
       console.error('Error deleting job:', err)
       setError(err.message)
